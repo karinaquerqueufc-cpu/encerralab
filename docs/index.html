@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EncerraLab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+/* Leiaute: coluna única de leitura (máx. 860px), cartões por função; no celular tudo empilha. */
+:root{
+  --fundo:#f4f7f5; --superficie:#ffffff; --tinta:#1b2a22; --suave:#57675e; --borda:#d6e0da;
+  --acento:#2f6f4f; --acento-claro:#e3efe8; --aviso:#fff3d1; --aviso-borda:#ead79c;
+  --bom:#2f6f4f; --meio:#9a6a12; --ruim:#b3412e;
+  --display:"Archivo",system-ui,sans-serif; --corpo:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --fundo:#111915; --superficie:#18231d; --tinta:#e4ece7; --suave:#9db0a5; --borda:#2c3b33;
+    --acento:#6cc297; --acento-claro:#1f3328; --aviso:#2e2914; --aviso-borda:#574b1f;
+    --bom:#6cc297; --meio:#e0b252; --ruim:#ef8a76; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --fundo:#111915; --superficie:#18231d; --tinta:#e4ece7; --suave:#9db0a5; --borda:#2c3b33;
+  --acento:#6cc297; --acento-claro:#1f3328; --aviso:#2e2914; --aviso-borda:#574b1f;
+  --bom:#6cc297; --meio:#e0b252; --ruim:#ef8a76; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--fundo);color:var(--tinta);font:17px/1.55 var(--corpo);-webkit-text-size-adjust:100%}
+a{color:var(--acento)}
+:focus-visible{outline:3px solid var(--meio);outline-offset:2px}
+header.topo{background:var(--acento);color:#fff;padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+:root[data-theme="dark"] header.topo{color:#0f1a14}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) header.topo{color:#0f1a14}}
+header.topo .marca{font:800 1.2rem var(--display);margin-right:auto;color:inherit;text-decoration:none}
+header.topo nav{display:flex;gap:16px;flex-wrap:wrap}
+@media (max-width:520px){header.topo .marca{flex-basis:100%}}
+header.topo nav a{color:inherit;text-decoration:none;font-weight:600;opacity:.92;padding:4px 0}
+header.topo nav a[aria-current="page"]{border-bottom:2px solid currentColor;opacity:1}
+.aviso{background:var(--aviso);border-bottom:1px solid var(--aviso-borda);padding:8px 16px;font-size:.92rem;text-align:center}
+main{max-width:860px;margin:0 auto;padding:20px 16px 40px;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:1.55rem} h2{font-size:1.15rem;margin-top:14px;padding-bottom:6px;border-bottom:2px solid var(--acento-claro)}
+h3{font-size:1rem}
+p{margin:0}
+.suave{color:var(--suave)}
+.pequeno{font-size:.88rem}
+.cartao{background:var(--superficie);border:1px solid var(--borda);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.cartao.clicavel{text-decoration:none;color:inherit}
+.cartao.clicavel:hover{border-color:var(--acento)}
+.chip{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.chip.bom{color:var(--bom)} .chip.meio{color:var(--meio)} .chip.ruim{color:var(--ruim)} .chip.neutro{color:var(--suave)}
+.narrativa p{margin:0 0 .6em}
+.crit{display:flex;flex-direction:column;gap:6px}
+.crit legend{font-weight:700;padding:0}
+fieldset{border:1px solid var(--borda);border-radius:10px;padding:12px;margin:0;background:var(--superficie)}
+.opcoes{display:flex;flex-wrap:wrap;gap:8px}
+.opcoes input{position:absolute;opacity:0;pointer-events:none}
+.opcoes label{border:1.5px solid var(--borda);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:.95rem;user-select:none}
+.opcoes input:checked+label{background:var(--acento);border-color:var(--acento);color:var(--superficie)}
+.opcoes input:focus-visible+label{outline:3px solid var(--meio);outline-offset:2px}
+input[type=text],textarea,select{width:100%;font:inherit;color:var(--tinta);background:var(--superficie);border:1.5px solid var(--borda);border-radius:8px;padding:10px}
+textarea{min-height:96px;resize:vertical}
+label.campo{display:flex;flex-direction:column;gap:6px;font-weight:600}
+button,.botao{font:700 1rem var(--corpo);background:var(--acento);color:var(--superficie);border:0;border-radius:8px;padding:12px 18px;cursor:pointer;align-self:flex-start;text-decoration:none;display:inline-block}
+button.secundario{background:transparent;color:var(--acento);border:1.5px solid var(--acento)}
+.erro{color:var(--ruim);font-weight:600}
+.ok{color:var(--bom);font-weight:600}
+.metricas{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.metrica{background:var(--superficie);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;font-size:.9rem;color:var(--suave)}
+.metrica b{display:block;font:800 1.55rem var(--display);color:var(--acento);font-variant-numeric:tabular-nums;margin-top:2px}
+.linha-crit{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--borda)}
+.linha-crit:last-child{border-bottom:0}
+.linha-crit .nome{font-weight:700}
+.linha-crit .chip{align-self:start}
+.linha-crit .detalhe{grid-column:1/-1;font-size:.92rem}
+.linha-crit .fund{grid-column:1/-1;font-size:.82rem;color:var(--suave)}
+.caminho{font:0.86rem/1.6 var(--mono);background:var(--acento-claro);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:pre-wrap}
+.rolagem{overflow-x:auto;border:1px solid var(--borda);border-radius:10px;background:var(--superficie)}
+table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--borda);text-align:left;vertical-align:top}
+th{background:var(--acento-claro);font-weight:700}
+td.num,th.num{text-align:right;white-space:nowrap}
+ul.perguntas{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px}
+footer{max-width:860px;margin:0 auto;padding:0 16px 32px;color:var(--suave);font-size:.85rem}
+.acoes{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="#inicio">EncerraLab</a>
+  <nav aria-label="Navegação principal">
+    <a href="#inicio" data-rota="inicio">Casos</a>
+    <a href="#docente" data-rota="docente">Painel docente</a>
+    <a href="#como-funciona" data-rota="como-funciona">Como funciona</a>
+  </nav>
+</header>
+<div class="aviso">Dados fictícios, apenas para fins didáticos. Municípios, lixões e planos desta demonstração foram inventados.</div>
+<main id="app"></main>
+<footer>Versão web de demonstração do protótipo EncerraLab (laboratório de aprendizagem com IA explicável). Os pareceres que você registra ficam apenas neste navegador.</footer>
+
+<script>
+"use strict";
+// ======================================================================== dados
+const CRITERIOS = [
+ ["CESSACAO_DISPOSICAO","Cessação da disposição e destinação adequada","Interrupção do lançamento de resíduos na área e envio para aterro sanitário licenciado.","Lei 12.305/2010 (PNRS), art. 47 (proíbe o lançamento in natura a céu aberto)."],
+ ["ISOLAMENTO_AREA","Isolamento e controle de acesso","Cercamento, sinalização e vigilância para impedir novos lançamentos e o acesso de pessoas e animais.","Boa prática de encerramento e remediação de áreas de disposição."],
+ ["INCLUSAO_CATADORES","Inclusão socioprodutiva de catadores","Cadastro das pessoas que trabalham no lixão e plano de inclusão (cooperativas, coleta seletiva, renda).","Lei 12.305/2010 (PNRS): eliminação de lixões associada à inclusão social e emancipação econômica de catadores."],
+ ["COBERTURA_FINAL","Conformação e cobertura dos resíduos","Regularização da massa de resíduos e cobertura final com solo para reduzir infiltração e exposição.","Boa prática de engenharia sanitária para recuperação de áreas degradadas por resíduos."],
+ ["DRENAGEM_PLUVIAL","Drenagem de águas pluviais","Sistema que desvia a água da chuva da massa de resíduos, reduzindo erosão e geração de lixiviado.","ABNT NBR 13896:1997 (critérios de projeto, implantação e operação de aterros)."],
+ ["LIXIVIADO","Coleta e tratamento de lixiviado (chorume)","Drenagem, coleta e tratamento do líquido percolado para evitar contaminação do solo e da água.","ABNT NBR 13896:1997; ABNT NBR 8419:1992."],
+ ["GASES","Drenagem e controle de gases","Drenos verticais e queima ou aproveitamento do biogás (metano), reduzindo risco de explosão e emissões.","ABNT NBR 8419:1992 (apresentação de projetos de aterros sanitários)."],
+ ["MONITORAMENTO_AGUAS","Monitoramento de águas superficiais e subterrâneas","Poços e pontos de amostragem com análises periódicas para acompanhar a contaminação.","ABNT NBR 13896:1997 (monitoramento das águas subterrâneas)."],
+ ["RECUPERACAO_AREA","Recuperação da área degradada e uso futuro","Plano de recuperação (revegetação, estabilidade geotécnica) e definição de uso futuro compatível.","Boa prática de recuperação de áreas degradadas (PRAD)."],
+ ["MONITORAMENTO_POS","Plano de monitoramento pós-encerramento","Responsáveis, frequência, indicadores e orçamento para acompanhar a área após o encerramento.","Boa prática de gestão pós-encerramento."]
+];
+const NIVEL = ["Não atende","Atende parcialmente","Atende"];
+const RISCO = {BAIXO:"Baixo",MEDIO:"Médio",ALTO:"Alto"};
+const DIST_H = {MENOS_DE_200M:"menos de 200 m de corpo hídrico",DE_200_A_500M:"entre 200 m e 500 m de corpo hídrico",MAIS_DE_500M:"mais de 500 m de corpo hídrico"};
+const DIST_U = {MENOS_DE_500M:"menos de 500 m de núcleo populacional",MAIS_DE_500M:"mais de 500 m de núcleo populacional"};
+const PORTE = {PEQUENO:"pequeno porte",MEDIO:"médio porte",GRANDE:"grande porte"};
+const PERGUNTAS = {
+ CESSACAO_DISPOSICAO:"O texto do caso garante que existe um aterro sanitário licenciado recebendo os resíduos, ou apenas que há uma intenção de enviá-los?",
+ ISOLAMENTO_AREA:"Cerca sem vigilância ou sinalização impede, de fato, novos lançamentos? Que evidência o caso traz?",
+ INCLUSAO_CATADORES:"Há pessoas trabalhando no local? O plano diz para onde elas vão e como manterão a renda?",
+ COBERTURA_FINAL:"A cobertura descrita abrange toda a massa de resíduos e tem a função de reduzir a infiltração da chuva?",
+ DRENAGEM_PLUVIAL:"Para onde vai a água da chuva que cai sobre a área? O que acontece se ela atravessar os resíduos?",
+ LIXIVIADO:"Coletar o chorume é suficiente? O caso informa o que é feito com ele depois da coleta?",
+ GASES:"Por que a decomposição dos resíduos continua gerando gás anos depois do encerramento? O plano trata disso?",
+ MONITORAMENTO_AGUAS:"Sem pontos de amostragem, como alguém saberia se o lençol freático está sendo contaminado?",
+ RECUPERACAO_AREA:"Qual uso futuro o plano propõe para a área? Ele é compatível com um terreno que ainda gera gás e recalques?",
+ MONITORAMENTO_POS:"Quem será responsável pela área depois que a obra terminar, por quanto tempo e com qual orçamento?"
+};
+const ESTUDO = {
+ 1:{titulo:"Lixão do Sítio Boa Vista — município fictício de Serra Clara",texto:[
+  "Lixão de pequeno porte, a cerca de 150 m de um riacho intermitente e a 1,2 km do núcleo urbano. Doze catadores trabalham diariamente no local.",
+  "O plano de encerramento informa que o município aderiu a um consórcio e que, desde o mês passado, os resíduos coletados seguem para um aterro sanitário licenciado a 60 km. Foi instalada cerca de arame em todo o perímetro, com placas de proibição, mas não há vigilância. Os catadores foram cadastrados pela assistência social; o plano não define para onde irão nem como manterão a renda.",
+  "Prevê-se cobrir com 30 cm de solo a metade da área que está mais exposta. Não há menção a drenagem de águas de chuva, a coleta de chorume, a drenos de gás ou a poços de monitoramento. Está prevista revegetação com espécies nativas, sem estudo de estabilidade do maciço. O documento não indica quem será responsável pela área após a obra."]},
+ 2:{titulo:"Lixão da Estrada Velha — município fictício de Vale do Sol",texto:[
+  "Lixão de médio porte, a 800 m do açude mais próximo e a 300 m de um bairro residencial. Não há mais catadores no local: anos antes, eles formaram uma associação que hoje é contratada pela prefeitura para a coleta seletiva.",
+  "Os resíduos já são enviados a aterro sanitário licenciado. A área está cercada, com portaria funcionando 24 horas. O projeto prevê conformação da massa de resíduos e cobertura total com camada de argila compactada e solo vegetal, além de canaletas periféricas para desviar a água da chuva. Drenos conduzem o chorume a uma lagoa, mas o projeto não define como ele será tratado.",
+  "Há drenos verticais de gás com queimadores e quatro poços de monitoramento com campanhas semestrais. Propõe-se transformar a área em parque, ainda sem estudo de estabilidade. A Secretaria de Meio Ambiente fica responsável pelo pós-encerramento, sem prazo nem orçamento definidos."]},
+ 3:{titulo:"Lixão do Riacho Seco — município fictício de Pedra Branca do Norte",texto:[
+  "Lixão de grande porte, a cerca de 400 m de um rio e a mais de 2 km da sede do município. Cerca de 40 catadores trabalham no local, alguns com as famílias.",
+  "O documento apresentado é um plano de transição: enquanto o aterro sanitário regional não obtém a licença de operação, cerca de metade dos resíduos continua sendo descarregada no lixão. Não há cercamento. Não há ação prevista para os catadores. Não há cobertura dos resíduos.",
+  "Foram abertas canaletas de drenagem em apenas um dos lados da área. O plano não trata de chorume, gases, monitoramento das águas, recuperação da área ou acompanhamento posterior."]},
+ 4:{titulo:"Lixão da Lagoa Funda — município fictício de Santa Aurora",texto:[
+  "Lixão de pequeno porte, a mais de 1 km de qualquer corpo hídrico e a mais de 3 km da área urbana. Não há catadores atuando.",
+  "Os resíduos seguem para aterro sanitário licenciado. A área foi cercada e é vigiada. O projeto prevê conformação e cobertura completa, drenagem pluvial em todo o perímetro, coleta do chorume com envio a estação de tratamento e três poços de monitoramento com análises trimestrais. Foram instalados drenos de gás, mas o projeto ainda não define se haverá queima.",
+  "A área será revegetada e destinada a reserva ambiental, com estudo geotécnico já concluído. O monitoramento pós-encerramento tem responsáveis e prazo de 20 anos definidos; o orçamento anual ainda não foi aprovado."]}
+};
+// 4 casos de estudo + 120 casos sintéticos de treinamento, exportados do protótipo Java (dados fictícios).
+const CASOS = [{"id":1,"estudo":true,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","PEQUENO",true],"p":[2,1,1,1,0,0,0,0,1,0]},{"id":2,"estudo":true,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MENOS_DE_500M","MEDIO",false],"p":[2,2,2,2,2,1,2,2,1,1]},{"id":3,"estudo":true,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","GRANDE",true],"p":[1,0,0,0,1,0,0,0,0,0]},{"id":4,"estudo":true,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MAIS_DE_500M","PEQUENO",false],"p":[2,2,2,2,2,2,1,2,2,1]},{"id":5,"estudo":false,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MAIS_DE_500M","PEQUENO",true],"p":[0,2,0,2,2,1,2,2,2,2]},{"id":6,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MENOS_DE_500M","PEQUENO",true],"p":[0,1,1,2,1,2,2,1,1,0]},{"id":7,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","GRANDE",false],"p":[0,0,0,0,0,1,1,0,0,1]},{"id":8,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",true],"p":[1,1,0,1,1,1,1,2,0,0]},{"id":9,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",false],"p":[0,0,0,0,0,0,0,0,0,1]},{"id":10,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",true],"p":[0,0,0,0,0,0,2,0,0,0]},{"id":11,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","GRANDE",true],"p":[1,0,0,1,1,1,1,1,0,1]},{"id":12,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","GRANDE",false],"p":[0,2,0,1,1,0,0,2,0,0]},{"id":13,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MAIS_DE_500M","MEDIO",true],"p":[0,2,0,1,1,0,2,2,2,2]},{"id":14,"estudo":false,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MAIS_DE_500M","PEQUENO",false],"p":[2,2,2,2,0,2,1,2,2,2]},{"id":15,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MAIS_DE_500M","GRANDE",true],"p":[1,2,1,0,0,1,2,2,1,1]},{"id":16,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MENOS_DE_500M","MEDIO",true],"p":[1,0,2,0,0,2,2,2,0,0]},{"id":17,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",false],"p":[1,2,2,2,0,1,0,1,2,0]},{"id":18,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","GRANDE",true],"p":[0,2,0,1,0,2,0,0,0,2]},{"id":19,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","PEQUENO",false],"p":[1,0,0,0,1,0,0,0,1,0]},{"id":20,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",true],"p":[2,1,1,2,1,2,1,0,1,0]},{"id":21,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MAIS_DE_500M","MEDIO",true],"p":[0,2,0,0,0,0,0,0,1,0]},{"id":22,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",false],"p":[1,0,2,2,1,0,0,0,1,0]},{"id":23,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","GRANDE",false],"p":[0,1,2,0,0,0,0,0,0,0]},{"id":24,"estudo":false,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MAIS_DE_500M","PEQUENO",false],"p":[0,2,0,1,1,2,2,2,2,1]},{"id":25,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MENOS_DE_500M","PEQUENO",false],"p":[2,1,1,2,0,1,2,2,1,0]},{"id":26,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",true],"p":[0,0,0,2,2,1,1,1,0,0]},{"id":27,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","PEQUENO",false],"p":[0,0,0,0,0,1,1,1,0,1]},{"id":28,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MAIS_DE_500M","GRANDE",true],"p":[2,1,2,1,0,2,2,2,1,0]},{"id":29,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","GRANDE",false],"p":[1,0,0,0,2,0,0,0,0,1]},{"id":30,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","GRANDE",false],"p":[1,1,1,0,1,2,2,2,1,0]},{"id":31,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",true],"p":[2,2,2,0,2,2,2,2,2,2]},{"id":32,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MAIS_DE_500M","MEDIO",false],"p":[2,2,1,2,1,0,1,1,2,1]},{"id":33,"estudo":false,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MAIS_DE_500M","MEDIO",true],"p":[2,2,2,2,1,2,2,2,0,2]},{"id":34,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","GRANDE",true],"p":[0,1,0,2,0,1,0,0,0,0]},{"id":35,"estudo":false,"rotulo":"BAIXO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",true],"p":[2,2,1,2,2,2,1,2,2,1]},{"id":36,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","PEQUENO",true],"p":[2,1,0,1,0,0,0,1,1,1]},{"id":37,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MENOS_DE_500M","GRANDE",true],"p":[0,1,1,2,2,1,1,1,0,1]},{"id":38,"estudo":false,"rotulo":"BAIXO","ctx":["DE_200_A_500M","MAIS_DE_500M","MEDIO",false],"p":[2,2,1,2,2,1,2,2,2,1]},{"id":39,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MAIS_DE_500M","PEQUENO",true],"p":[0,0,0,1,0,0,0,0,0,1]},{"id":40,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MAIS_DE_500M","MEDIO",true],"p":[0,2,2,1,2,2,0,0,1,2]},{"id":41,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",false],"p":[1,1,0,1,1,1,1,0,0,0]},{"id":42,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","PEQUENO",false],"p":[0,2,1,2,0,2,1,0,1,0]},{"id":43,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","PEQUENO",false],"p":[1,2,0,0,2,1,2,0,0,0]},{"id":44,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","GRANDE",true],"p":[2,2,2,1,0,1,2,0,1,1]},{"id":45,"estudo":false,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MENOS_DE_500M","MEDIO",true],"p":[1,2,1,2,2,2,2,2,2,2]},{"id":46,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","GRANDE",false],"p":[1,0,0,0,2,0,1,0,1,2]},{"id":47,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",true],"p":[2,2,2,2,2,2,1,2,0,1]},{"id":48,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","PEQUENO",true],"p":[0,0,0,0,1,0,0,0,0,0]},{"id":49,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","PEQUENO",false],"p":[1,0,0,0,1,0,0,0,0,0]},{"id":50,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",true],"p":[2,2,1,2,0,2,2,1,2,2]},{"id":51,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",true],"p":[0,2,2,2,2,1,2,1,0,2]},{"id":52,"estudo":false,"rotulo":"BAIXO","ctx":["MENOS_DE_200M","MAIS_DE_500M","GRANDE",true],"p":[2,2,1,2,2,2,1,2,2,2]},{"id":53,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MAIS_DE_500M","GRANDE",false],"p":[1,0,1,2,2,2,2,0,2,1]},{"id":54,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MAIS_DE_500M","GRANDE",true],"p":[2,2,2,1,2,2,1,2,0,1]},{"id":55,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MAIS_DE_500M","MEDIO",false],"p":[1,0,1,0,2,1,1,0,0,0]},{"id":56,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","MEDIO",false],"p":[2,2,0,0,0,1,1,0,0,1]},{"id":57,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","GRANDE",false],"p":[1,0,0,1,0,0,1,1,0,2]},{"id":58,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","PEQUENO",true],"p":[0,1,0,2,1,1,1,0,0,1]},{"id":59,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","PEQUENO",true],"p":[0,0,0,1,1,0,2,0,0,0]},{"id":60,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","PEQUENO",true],"p":[1,0,1,0,0,1,1,1,2,0]},{"id":61,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","PEQUENO",true],"p":[0,0,2,0,1,2,0,1,1,0]},{"id":62,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",false],"p":[2,0,0,2,0,1,1,0,0,1]},{"id":63,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","PEQUENO",false],"p":[0,0,1,2,0,0,2,2,1,0]},{"id":64,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MAIS_DE_500M","MEDIO",false],"p":[0,1,0,0,0,0,1,1,0,0]},{"id":65,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",false],"p":[1,0,0,1,1,1,0,0,1,0]},{"id":66,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","GRANDE",true],"p":[0,1,0,2,0,0,1,0,0,1]},{"id":67,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","GRANDE",true],"p":[1,0,0,0,2,1,0,0,0,0]},{"id":68,"estudo":false,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MAIS_DE_500M","MEDIO",true],"p":[0,2,1,1,2,2,2,2,1,2]},{"id":69,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","PEQUENO",false],"p":[0,0,0,0,0,0,1,1,1,0]},{"id":70,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",false],"p":[1,1,2,0,2,0,0,1,1,1]},{"id":71,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",false],"p":[1,2,2,0,2,2,2,1,1,1]},{"id":72,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MENOS_DE_500M","MEDIO",false],"p":[2,0,0,2,0,0,1,2,0,2]},{"id":73,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",false],"p":[2,0,1,2,2,2,1,0,2,1]},{"id":74,"estudo":false,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MAIS_DE_500M","PEQUENO",true],"p":[1,1,0,1,1,2,0,2,1,0]},{"id":75,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MENOS_DE_500M","GRANDE",true],"p":[1,0,1,2,1,1,0,1,1,0]},{"id":76,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","GRANDE",true],"p":[0,0,2,2,0,1,2,0,2,0]},{"id":77,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MAIS_DE_500M","PEQUENO",false],"p":[0,2,2,2,2,1,2,2,1,1]},{"id":78,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","GRANDE",false],"p":[2,1,2,2,2,1,2,1,2,2]},{"id":79,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",true],"p":[0,1,0,0,0,0,0,0,0,0]},{"id":80,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","GRANDE",false],"p":[0,1,1,1,1,0,2,1,1,0]},{"id":81,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","GRANDE",false],"p":[1,1,0,1,2,1,0,0,0,0]},{"id":82,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MENOS_DE_500M","GRANDE",false],"p":[1,2,0,2,2,2,2,2,2,2]},{"id":83,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MENOS_DE_500M","PEQUENO",true],"p":[2,2,1,2,2,1,1,1,2,0]},{"id":84,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","MEDIO",false],"p":[0,1,0,0,1,0,0,0,0,0]},{"id":85,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",true],"p":[2,2,0,1,2,1,0,1,1,2]},{"id":86,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",true],"p":[2,1,1,0,2,2,0,2,0,1]},{"id":87,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",true],"p":[1,2,1,2,0,1,1,1,0,1]},{"id":88,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","GRANDE",true],"p":[0,1,1,2,1,0,0,1,0,1]},{"id":89,"estudo":false,"rotulo":"MEDIO","ctx":["MAIS_DE_500M","MAIS_DE_500M","MEDIO",true],"p":[1,1,0,1,1,0,0,1,0,0]},{"id":90,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MAIS_DE_500M","PEQUENO",true],"p":[1,1,2,1,0,2,2,2,2,2]},{"id":91,"estudo":false,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MENOS_DE_500M","MEDIO",true],"p":[2,2,2,2,2,1,1,2,2,0]},{"id":92,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","GRANDE",true],"p":[0,1,1,0,1,1,0,1,1,1]},{"id":93,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","PEQUENO",true],"p":[2,1,0,1,0,0,0,1,0,1]},{"id":94,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MAIS_DE_500M","MEDIO",false],"p":[0,0,2,0,0,0,1,1,1,0]},{"id":95,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MAIS_DE_500M","GRANDE",false],"p":[0,1,1,0,0,0,0,1,0,0]},{"id":96,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MAIS_DE_500M","MEDIO",false],"p":[1,0,1,2,0,2,1,0,2,0]},{"id":97,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",false],"p":[1,1,2,0,1,0,1,2,2,2]},{"id":98,"estudo":false,"rotulo":"BAIXO","ctx":["DE_200_A_500M","MAIS_DE_500M","MEDIO",false],"p":[1,1,0,2,2,2,1,1,2,0]},{"id":99,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MAIS_DE_500M","MEDIO",true],"p":[1,1,0,1,0,0,1,2,0,0]},{"id":100,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","GRANDE",false],"p":[0,1,1,0,0,0,1,0,2,1]},{"id":101,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",true],"p":[0,0,0,1,1,0,2,0,0,0]},{"id":102,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","MEDIO",true],"p":[1,0,1,2,0,1,0,0,0,2]},{"id":103,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","GRANDE",true],"p":[0,0,0,1,0,0,1,2,0,1]},{"id":104,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MAIS_DE_500M","GRANDE",false],"p":[1,1,2,2,1,2,2,0,2,1]},{"id":105,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","MEDIO",false],"p":[1,0,0,1,0,2,0,0,0,0]},{"id":106,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",false],"p":[0,2,0,2,1,0,1,2,2,2]},{"id":107,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",false],"p":[0,0,0,1,0,1,0,1,0,0]},{"id":108,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MAIS_DE_500M","PEQUENO",false],"p":[1,0,1,1,1,2,2,1,2,0]},{"id":109,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","GRANDE",true],"p":[2,1,1,2,2,0,0,2,2,1]},{"id":110,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MENOS_DE_500M","PEQUENO",true],"p":[0,2,2,2,0,2,0,2,1,2]},{"id":111,"estudo":false,"rotulo":"ALTO","ctx":["DE_200_A_500M","MENOS_DE_500M","GRANDE",false],"p":[1,2,1,0,1,1,0,0,2,1]},{"id":112,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MAIS_DE_500M","MEDIO",true],"p":[1,0,0,1,1,2,1,1,1,2]},{"id":113,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","GRANDE",false],"p":[1,1,2,0,1,0,1,0,0,1]},{"id":114,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MENOS_DE_500M","MEDIO",false],"p":[2,2,2,2,1,2,2,2,2,1]},{"id":115,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MAIS_DE_500M","MEDIO",false],"p":[0,2,2,0,0,1,2,1,2,2]},{"id":116,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MAIS_DE_500M","GRANDE",false],"p":[2,0,1,0,0,0,1,0,1,0]},{"id":117,"estudo":false,"rotulo":"BAIXO","ctx":["MAIS_DE_500M","MAIS_DE_500M","PEQUENO",false],"p":[2,2,1,1,1,2,2,1,2,2]},{"id":118,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",true],"p":[2,1,2,0,2,1,2,1,1,1]},{"id":119,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",true],"p":[2,0,0,2,2,1,0,2,0,1]},{"id":120,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","PEQUENO",false],"p":[0,0,0,1,2,1,2,0,2,2]},{"id":121,"estudo":false,"rotulo":"ALTO","ctx":["MENOS_DE_200M","MENOS_DE_500M","MEDIO",true],"p":[0,1,2,0,0,0,0,1,1,1]},{"id":122,"estudo":false,"rotulo":"MEDIO","ctx":["MENOS_DE_200M","MAIS_DE_500M","PEQUENO",true],"p":[2,1,1,1,1,2,2,2,1,2]},{"id":123,"estudo":false,"rotulo":"MEDIO","ctx":["DE_200_A_500M","MENOS_DE_500M","PEQUENO",false],"p":[1,1,1,2,2,2,1,1,2,2]},{"id":124,"estudo":false,"rotulo":"ALTO","ctx":["MAIS_DE_500M","MENOS_DE_500M","GRANDE",false],"p":[0,0,1,0,2,1,0,2,0,1]}];
+
+// ============================================================ IA: índice (ICP)
+const PESOS = CRITERIOS.map(() => 1);
+function avaliarICP(p){
+  const soma = PESOS.reduce((a,b)=>a+b,0);
+  let total = 0;
+  const parcelas = CRITERIOS.map((c,i) => {
+    const contrib = 100*PESOS[i]*(p[i]/2)/soma, perda = 100*PESOS[i]/soma - contrib;
+    total += contrib; return {i, nivel:p[i], peso:PESOS[i], contrib, perda};
+  });
+  const icp = Math.round(total*10)/10;
+  return {icp, faixa: icp>=80?"Plano adequado":icp>=50?"Plano com lacunas relevantes":"Plano insuficiente", parcelas};
+}
+
+// ===================================================== IA: árvore de decisão
+// Mesmo algoritmo do protótipo Java: Gini, divisão multivia, profundidade 2, mínimo de 6 amostras.
+function atributos(caso){
+  const a = new Map();
+  CRITERIOS.forEach((c,i) => a.set(c[1], NIVEL[caso.p[i]]));
+  a.set("Distância de corpo hídrico", DIST_H[caso.ctx[0]]);
+  a.set("Distância de núcleo populacional", DIST_U[caso.ctx[1]]);
+  a.set("Porte do lixão", PORTE[caso.ctx[2]]);
+  a.set("Catadores atuando na área", caso.ctx[3] ? "sim" : "não");
+  return a;
+}
+const cmp = (a,b) => a<b?-1:a>b?1:0;
+function contar(d){ const m=new Map(); d.forEach(e=>m.set(e.c,(m.get(e.c)||0)+1)); return m; }
+function maioria(m){ let best=null,bc=-1; for(const [k,v] of m){ if(v>bc || (v===bc && k<best)){best=k;bc=v;} } return best; }
+function gini(m,n){ let s=1; for(const v of m.values()){const p=v/n; s-=p*p;} return s; }
+function particionar(d,atr){ const m=new Map(); d.forEach(e=>{const v=e.a.get(atr); if(!m.has(v)) m.set(v,[]); m.get(v).push(e);}); return m; }
+function construir(d, atrs, prof, P, M){
+  const cont = contar(d), mai = maioria(cont);
+  if (cont.size===1 || prof>=P || d.length<M || atrs.length===0) return {folha:true, mai, cont, n:d.length};
+  const gAtual = gini(cont, d.length);
+  let melhor=null, mg=1e-9;
+  for (const atr of atrs){
+    const part = particionar(d, atr); if (part.size<2) continue;
+    let pond=0; for (const sub of part.values()) pond += sub.length/d.length*gini(contar(sub), sub.length);
+    const g = gAtual-pond; if (g>mg){mg=g; melhor=atr;}
+  }
+  if (melhor===null) return {folha:true, mai, cont, n:d.length};
+  const rest = atrs.filter(a=>a!==melhor), filhos = new Map();
+  [...particionar(d, melhor).entries()].sort((x,y)=>cmp(x[0],y[0])).forEach(([k,sub]) => filhos.set(k, construir(sub, rest, prof+1, P, M)));
+  return {folha:false, atr:melhor, filhos, mai, cont, n:d.length};
+}
+const prop = no => (no.cont.get(no.mai)||0)/no.n;
+function treinar(ex,P,M){ return construir(ex, [...ex[0].a.keys()], 0, P, M); }
+function prever(raiz, a){
+  const caminho=[]; let no=raiz;
+  while(!no.folha){
+    const v=a.get(no.atr), prox=no.filhos.get(v);
+    if(!prox){ caminho.push(`Valor não visto para "${no.atr}": usada a classe majoritária.`); break; }
+    caminho.push((caminho.length? "E ":"SE ")+no.atr+" = "+v); no=prox;
+  }
+  return {classe:no.mai, conf:prop(no), suporte:no.n, caminho};
+}
+function regras(no, cond=[], out=[]){
+  if(no.folha){ out.push(`SE ${cond.length?cond.join(" E "):"(sempre)"} ENTÃO ${no.mai} [${no.n} casos; ${Math.round(prop(no)*100)}% de concordância]`); return out; }
+  for(const [k,f] of no.filhos) regras(f, [...cond, no.atr+" = "+k], out);
+  return out;
+}
+const EXEMPLOS = CASOS.filter(c=>!c.estudo).map(c=>({a:atributos(c), c:RISCO[c.rotulo]}));
+const PROF=2, MIN=6;
+const ARVORE = treinar(EXEMPLOS, PROF, MIN);
+let acertos=0;
+EXEMPLOS.forEach((e,i)=>{ const t=EXEMPLOS.filter((_,j)=>j!==i); if(prever(treinar(t,PROF,MIN), e.a).classe===e.c) acertos++; });
+const ACURACIA = acertos/EXEMPLOS.length;
+
+// ================================================================ estado local
+const CHAVE = "encerralab-demo-v1";
+function exemplosIniciais(){
+  const n = (s)=>s.split("").map(Number);
+  return {seq:3, av:[
+    {id:1, caso:1, est:"Exemplo 1", p:n("2212010010"), r:"MEDIO", just:"(parecer de exemplo, fictício)", ex:true},
+    {id:2, caso:2, est:"Exemplo 2", p:n("2222222211"), r:"BAIXO", just:"(parecer de exemplo, fictício)", ex:true},
+    {id:3, caso:3, est:"Exemplo 3", p:n("1000110000"), r:"ALTO", just:"(parecer de exemplo, fictício)", ex:true}
+  ], ct:[], seqc:0};
+}
+let ESTADO;
+function carregar(){ try{ const s=localStorage.getItem(CHAVE); ESTADO = s? JSON.parse(s) : exemplosIniciais(); }catch(e){ ESTADO = exemplosIniciais(); } }
+function salvar(){ try{ localStorage.setItem(CHAVE, JSON.stringify(ESTADO)); }catch(e){} }
+carregar();
+
+// ===================================================================== apoio
+const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = v => Number.isInteger(v)? String(v) : v.toLocaleString("pt-BR",{maximumFractionDigits:1});
+const caso = id => CASOS.find(c=>c.id===id);
+const $app = document.getElementById("app");
+function navAtual(r){ document.querySelectorAll("nav a").forEach(a=>{ if(a.dataset.rota===r) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); }); }
+function chipSituacao(al, ref){
+  if(al===ref) return '<span class="chip bom">Concorda</span>';
+  return al>ref? '<span class="chip meio">Mais otimista</span>' : '<span class="chip ruim">Mais rigoroso(a)</span>';
+}
+function chipRisco(r){ const k={Baixo:"bom","Médio":"meio",Alto:"ruim"}[r]||"neutro"; return `<span class="chip ${k}">${esc(r)}</span>`; }
+
+// ===================================================================== telas
+function telaInicio(){
+  navAtual("inicio");
+  const cards = [1,2,3,4].map(id=>{
+    const e=ESTUDO[id];
+    const feitos = ESTADO.av.filter(a=>a.caso===id && !a.ex).length;
+    return `<a class="cartao clicavel" href="#caso-${id}">
+      <h3>${esc(e.titulo)}</h3>
+      <p class="suave pequeno">${esc(e.texto[0])}</p>
+      <span class="pequeno"><b>Analisar este caso →</b>${feitos?` <span class="suave">· ${feitos} parecer(es) seu(s)</span>`:""}</span></a>`;
+  }).join("");
+  $app.innerHTML = `
+    <h1>Laboratório de avaliação de planos de encerramento de lixões</h1>
+    <p>Escolha um caso, leia o plano de encerramento e dê o <b>seu</b> parecer, critério a critério. Só depois você verá a análise de referência e a da inteligência artificial, com a explicação de cada resultado. Se discordar da IA, argumente: um docente vai analisar a sua contestação.</p>
+    <h2>Casos disponíveis</h2>${cards}`;
+}
+
+function telaCaso(id, erro){
+  const e=ESTUDO[id]; if(!e) return telaInicio();
+  navAtual("");
+  const crit = CRITERIOS.map((c,i)=>`
+    <fieldset class="crit"><legend>${esc(c[1])}</legend>
+      <span class="suave pequeno">${esc(c[2])}</span>
+      <div class="opcoes">${NIVEL.map((n,v)=>`<input type="radio" id="c${i}v${v}" name="c${i}" value="${v}"><label for="c${i}v${v}">${n}</label>`).join("")}</div>
+    </fieldset>`).join("");
+  $app.innerHTML = `
+    <h1>${esc(e.titulo)}</h1>
+    <div class="cartao narrativa">${e.texto.map(t=>`<p>${esc(t)}</p>`).join("")}</div>
+    <h2>Seu parecer</h2>
+    <form id="form-parecer" class="crit" novalidate>
+      <label class="campo" for="estudante">Código do estudante (use um código, não o seu nome)
+        <input type="text" id="estudante" maxlength="80" autocomplete="off" placeholder="Ex.: E-101"></label>
+      ${crit}
+      <fieldset class="crit"><legend>Risco ambiental residual após o plano</legend>
+        <div class="opcoes">${Object.entries(RISCO).map(([k,r])=>`<input type="radio" id="r${k}" name="risco" value="${k}"><label for="r${k}">${r}</label>`).join("")}</div>
+      </fieldset>
+      <label class="campo" for="justificativa">Justificativa (o que pesou mais na sua análise?)
+        <textarea id="justificativa"></textarea></label>
+      <p id="erro-form" class="erro" role="alert">${erro?esc(erro):""}</p>
+      <button type="submit">Enviar parecer e ver a análise</button>
+    </form>`;
+  document.getElementById("form-parecer").addEventListener("submit", ev=>{
+    ev.preventDefault();
+    const f=ev.target, est=f.querySelector("#estudante").value.trim();
+    const p=CRITERIOS.map((c,i)=>{ const x=f.querySelector(`input[name=c${i}]:checked`); return x? Number(x.value) : null; });
+    const r=f.querySelector("input[name=risco]:checked");
+    const faltam = CRITERIOS.filter((c,i)=>p[i]===null).map(c=>c[1]);
+    const msg = !est? "Informe o código do estudante." : faltam.length? `Avalie todos os critérios. Falta: ${faltam.join("; ")}.` : !r? "Informe o risco estimado." : "";
+    if(msg){ const el=document.getElementById("erro-form"); el.textContent=msg; el.scrollIntoView({block:"center"}); return; }
+    const novo={id:++ESTADO.seq, caso:id, est, p, r:r.value, just:f.querySelector("#justificativa").value.trim(), em:new Date().toISOString()};
+    ESTADO.av.push(novo); salvar(); location.hash = "resultado-"+novo.id;
+  });
+  window.scrollTo(0,0);
+}
+
+function telaResultado(avId, msg){
+  const a=ESTADO.av.find(x=>x.id===avId); if(!a) return telaInicio();
+  navAtual("");
+  const c=caso(a.caso), e=ESTUDO[a.caso];
+  const ref=RISCO[c.rotulo], prev=prever(ARVORE, atributos(c));
+  const iguais=a.p.filter((v,i)=>v===c.p[i]).length, conc=Math.round(1000*iguais/CRITERIOS.length)/10;
+  const icpAl=avaliarICP(a.p).icp, icpRef=avaliarICP(c.p);
+  const riscoAl=RISCO[a.r];
+  const linhas = CRITERIOS.map((cr,i)=>`
+    <div class="linha-crit"><span class="nome">${esc(cr[1])}</span>${chipSituacao(a.p[i], c.p[i])}
+      <span class="detalhe">Seu parecer: <b>${NIVEL[a.p[i]]}</b> · Referência: <b>${NIVEL[c.p[i]]}</b></span>
+      <span class="fund">${esc(cr[3])}</span></div>`).join("");
+  const perguntas = [];
+  CRITERIOS.forEach((cr,i)=>{ if(a.p[i]!==c.p[i]) perguntas.push(`<b>${esc(cr[1])}:</b> ${a.p[i]>c.p[i]?"Você foi mais otimista que a referência":"Você foi mais rigoroso(a) que a referência"}. ${esc(PERGUNTAS[cr[0]])}`); });
+  if(riscoAl!==ref) perguntas.push(`<b>Risco residual:</b> você estimou ${riscoAl} e a referência indica ${ref}. Releia a localização do lixão (distância da água e das casas): ela muda a gravidade das lacunas do plano?`);
+  if(!perguntas.length) perguntas.push("Seu parecer coincide com a referência em todos os critérios. Desafio: qual critério você considera mais frágil na própria referência, e por quê? Se discordar, registre uma contestação.");
+  const parcelas = icpRef.parcelas.map(p=>`<tr><td>${esc(CRITERIOS[p.i][1])}</td><td>${NIVEL[p.nivel]}</td><td class="num">${fmt(p.peso)}</td><td class="num">${fmt(Math.round(p.contrib*10)/10)}</td><td class="num">${fmt(Math.round(p.perda*10)/10)}</td></tr>`).join("");
+  const minhas = ESTADO.ct.filter(x=>x.av===avId);
+  $app.innerHTML = `
+    <h1>Resultado: ${esc(e.titulo)}</h1>
+    ${msg?`<p class="ok" role="status">${esc(msg)}</p>`:""}
+    <div class="metricas">
+      <div class="metrica">Concordância com a referência<b>${fmt(conc)}%</b></div>
+      <div class="metrica">Seu índice de conformidade<b>${fmt(icpAl)}</b></div>
+      <div class="metrica">Índice de referência<b>${fmt(icpRef.icp)}</b></div>
+      <div class="metrica">Risco: você × referência<b>${riscoAl} × ${ref}</b></div>
+    </div>
+    <h2>Critério a critério</h2>
+    <div class="cartao">${linhas}</div>
+    <h2>Perguntas para você refletir</h2>
+    <div class="cartao"><ul class="perguntas">${perguntas.map(p=>`<li>${p}</li>`).join("")}</ul>
+      <span class="suave pequeno">Tutor reflexivo (perguntas elaboradas pelo corpo docente)</span></div>
+    <h2>O que a inteligência artificial previu, e por quê</h2>
+    <div class="cartao">
+      <p>O modelo de aprendizado de máquina (árvore de decisão) estimou risco ${chipRisco(prev.classe)} com base em ${prev.suporte} casos semelhantes da base de treinamento (${Math.round(prev.conf*100)}% deles nessa classe). Caminho de decisão:</p>
+      <div class="caminho">${prev.caminho.map(esc).join("\n")}\nENTÃO risco = ${esc(prev.classe)}</div>
+      ${prev.classe!==ref?`<p class="erro">Atenção: a IA discordou da classificação do especialista (${ref}). Modelos erram. O que o modelo pode não estar considerando neste caso?</p>`:""}
+    </div>
+    <h2>Índice de conformidade da referência (cálculo transparente)</h2>
+    <p class="suave pequeno">ICP = 100 × Σ(peso × nível ÷ 2) ÷ Σ pesos, com nível 0, 1 ou 2.</p>
+    <div class="rolagem"><table><thead><tr><th>Critério</th><th>Nível</th><th class="num">Peso</th><th class="num">Pontos obtidos</th><th class="num">Pontos perdidos</th></tr></thead>
+      <tbody>${parcelas}<tr><th colspan="3">Total (0 a 100)</th><th colspan="2" class="num">${fmt(icpRef.icp)} · ${esc(icpRef.faixa)}</th></tr></tbody></table></div>
+    <h2>Discorda da análise? Conteste.</h2>
+    <form id="form-contestar" class="cartao" novalidate>
+      <label class="campo" for="alvo">O que você contesta?
+        <select id="alvo"><option value="Classificação de risco">Classificação de risco</option>${CRITERIOS.map(c=>`<option>${esc(c[1])}</option>`).join("")}</select></label>
+      <label class="campo" for="argumento">Argumento (cite o trecho do caso e a norma ou a literatura)
+        <textarea id="argumento"></textarea></label>
+      <p id="erro-ct" class="erro" role="alert"></p>
+      <button type="submit">Registrar contestação</button>
+    </form>
+    ${minhas.length?`<h2>Suas contestações</h2>${minhas.map(cardContestacao).join("")}`:""}
+    <div class="acoes"><a class="botao" href="#inicio">Analisar outro caso</a></div>`;
+  document.getElementById("form-contestar").addEventListener("submit", ev=>{
+    ev.preventDefault();
+    const arg=ev.target.querySelector("#argumento").value.trim();
+    if(arg.length<20){ document.getElementById("erro-ct").textContent="Explique a sua discordância com pelo menos 20 caracteres."; return; }
+    ESTADO.ct.push({id:++ESTADO.seqc, av:avId, alvo:ev.target.querySelector("#alvo").value, arg, st:"PENDENTE", resp:"", em:new Date().toISOString()});
+    salvar(); telaResultado(avId, "Contestação registrada. Um docente vai analisá-la no painel docente.");
+  });
+  if(!msg) window.scrollTo(0,0);
+}
+
+function cardContestacao(ct){
+  const st = {PENDENTE:'<span class="chip neutro">Pendente</span>',ACEITA:'<span class="chip bom">Aceita</span>',REJEITADA:'<span class="chip ruim">Rejeitada</span>'}[ct.st];
+  return `<div class="cartao"><div class="acoes"><b>${esc(ct.alvo)}</b>${st}</div><p>${esc(ct.arg)}</p>${ct.resp?`<p class="suave"><i>Resposta docente:</i> ${esc(ct.resp)}</p>`:""}</div>`;
+}
+
+function telaDocente(){
+  navAtual("docente");
+  const av=ESTADO.av, pend=ESTADO.ct.filter(c=>c.st==="PENDENTE");
+  const stats = CRITERIOS.map((cr,i)=>{
+    let n=0,ig=0,sup=0,sub=0;
+    av.forEach(a=>{ const ref=caso(a.caso).p[i]; n++; if(a.p[i]===ref) ig++; else if(a.p[i]>ref) sup++; else sub++; });
+    return {nome:cr[1], n, pct: n? Math.round(1000*ig/n)/10 : 0, sup, sub};
+  }).sort((x,y)=>x.pct-y.pct);
+  const linhas = stats.map(s=>`<tr><td>${esc(s.nome)}</td><td class="num">${s.n}</td><td class="num">${s.n?fmt(s.pct)+"%":"—"}</td><td class="num">${s.sup}</td><td class="num">${s.sub}</td></tr>`).join("");
+  const conts = ESTADO.ct.length? ESTADO.ct.slice().reverse().map(ct=>{
+    const a=ESTADO.av.find(x=>x.id===ct.av);
+    const cab = `<div class="acoes"><b>${esc(ct.alvo)}</b><span class="suave pequeno">${esc(ESTUDO[a.caso].titulo)} · ${esc(a.est)}</span></div><p>${esc(ct.arg)}</p>`;
+    if(ct.st!=="PENDENTE") return `<div class="cartao">${cab}<p>${ct.st==="ACEITA"?'<span class="chip bom">Aceita</span>':'<span class="chip ruim">Rejeitada</span>'}</p><p class="suave"><i>Resposta docente:</i> ${esc(ct.resp)}</p></div>`;
+    return `<form class="cartao form-decidir" data-id="${ct.id}" novalidate>${cab}
+      <label class="campo" for="resp${ct.id}">Resposta ao estudante<textarea id="resp${ct.id}"></textarea></label>
+      <label class="campo" for="dec${ct.id}">Decisão<select id="dec${ct.id}"><option value="ACEITA">Aceitar (a referência será revista)</option><option value="REJEITADA">Rejeitar</option></select></label>
+      <p class="erro" role="alert"></p><button type="submit">Registrar decisão</button></form>`;
+  }).join("") : '<p class="suave">Nenhuma contestação registrada. Envie um parecer e conteste um resultado para ver esta área funcionando.</p>';
+  $app.innerHTML = `
+    <h1>Painel docente</h1>
+    <div class="metricas">
+      <div class="metrica">Pareceres enviados<b>${av.length}</b></div>
+      <div class="metrica">Contestações pendentes<b>${pend.length}</b></div>
+      <div class="metrica">Acurácia do modelo (LOO)<b>${fmt(Math.round(ACURACIA*1000)/10)}%</b></div>
+      <div class="metrica">Casos de treinamento<b>${EXEMPLOS.length}</b></div>
+    </div>
+    <p class="suave pequeno">Inclui 3 pareceres de exemplo, fictícios, para o painel não começar vazio.</p>
+    <h2>Onde a turma mais diverge (do menor para o maior acerto)</h2>
+    <div class="rolagem"><table><thead><tr><th>Critério</th><th class="num">Respostas</th><th class="num">% concordância</th><th class="num">Mais otimistas</th><th class="num">Mais rigorosos</th></tr></thead><tbody>${linhas}</tbody></table></div>
+    <h2>Contestações</h2>${conts}
+    <h2>Regras aprendidas pelo modelo (auditoria)</h2>
+    <div class="caminho">${regras(ARVORE).map(esc).join("\n")}</div>
+    <h2>Demonstração</h2>
+    <div class="cartao"><p class="pequeno">Apaga os pareceres e contestações registrados neste navegador e volta aos exemplos iniciais.</p>
+      <div class="acoes"><button type="button" class="secundario" id="reiniciar">Reiniciar demonstração</button><span id="confirma" class="pequeno"></span></div></div>`;
+  document.querySelectorAll(".form-decidir").forEach(f=>f.addEventListener("submit", ev=>{
+    ev.preventDefault();
+    const id=Number(f.dataset.id), resp=f.querySelector("textarea").value.trim();
+    if(!resp){ f.querySelector(".erro").textContent="Escreva uma resposta ao estudante."; return; }
+    const ct=ESTADO.ct.find(x=>x.id===id); ct.st=f.querySelector("select").value; ct.resp=resp; salvar(); telaDocente();
+  }));
+  const bt=document.getElementById("reiniciar");
+  bt.addEventListener("click", ()=>{
+    if(bt.dataset.armado){ ESTADO=exemplosIniciais(); salvar(); telaDocente(); return; }
+    bt.dataset.armado="1"; bt.textContent="Confirmar: apagar tudo"; document.getElementById("confirma").textContent="Toque de novo para confirmar.";
+  });
+  window.scrollTo(0,0);
+}
+
+function telaComo(){
+  navAtual("como-funciona");
+  $app.innerHTML = `
+    <h1>Como a IA do EncerraLab funciona</h1>
+    <div class="cartao"><h3>1. Índice de conformidade (regra explícita)</h3><p>Cada critério recebe um nível (0, 1 ou 2) e um peso. O índice é a soma ponderada normalizada de 0 a 100. Todas as parcelas aparecem na tela de resultado e podem ser conferidas à mão.</p></div>
+    <div class="cartao"><h3>2. Modelo de aprendizado de máquina (árvore de decisão)</h3><p>Aprende, a partir de casos já classificados por especialistas, a estimar o risco ambiental residual. Foi escolhido por ser interpretável: toda previsão mostra o caminho de regras que a gerou. Nesta página, o modelo é treinado no seu próprio navegador com ${EXEMPLOS.length} casos e avaliado por validação cruzada <i>leave-one-out</i> (acurácia de ${fmt(Math.round(ACURACIA*1000)/10)}%). Os casos de estudo ficam fora do treino.</p></div>
+    <div class="cartao"><h3>3. Tutor reflexivo</h3><p>Devolve perguntas de reflexão, nunca a resposta pronta. As perguntas foram escritas para cada critério pelo corpo docente.</p></div>
+    <div class="cartao"><h3>4. Supervisão humana</h3><p>A referência de cada caso é validada por docente. O estudante pode contestar qualquer resultado, e a decisão final é sempre humana.</p></div>
+    <div class="cartao"><h3>5. Limitações</h3><p>Nesta demonstração, os casos e os rótulos de treinamento são fictícios e foram gerados por uma regra ilustrativa. As métricas do modelo, portanto, não indicam o desempenho real, que depende de uma base rotulada por especialistas.</p></div>
+    <div class="cartao"><h3>6. Esta versão web</h3><p>Reproduz o protótipo em Java com PostgreSQL. Aqui, os pareceres ficam guardados apenas neste navegador e não são enviados a lugar nenhum.</p></div>
+    <h2>Critérios e fundamentos</h2>
+    <div class="rolagem"><table><thead><tr><th>Critério</th><th class="num">Peso</th><th>Fundamento</th></tr></thead><tbody>
+      ${CRITERIOS.map((c,i)=>`<tr><td>${esc(c[1])}</td><td class="num">${PESOS[i]}</td><td class="pequeno">${esc(c[3])}</td></tr>`).join("")}</tbody></table></div>`;
+  window.scrollTo(0,0);
+}
+
+// =================================================================== rotas
+function rotear(){
+  const h=location.hash.replace(/^#/,"");
+  let m;
+  if((m=h.match(/^caso-(\d)$/))) telaCaso(Number(m[1]));
+  else if((m=h.match(/^resultado-(\d+)$/))) telaResultado(Number(m[1]));
+  else if(h==="docente") telaDocente();
+  else if(h==="como-funciona") telaComo();
+  else telaInicio();
+}
+window.addEventListener("hashchange", rotear);
+rotear();
+window.__teste = {ACURACIA, regras: ()=>regras(ARVORE), prever:(id)=>prever(ARVORE, atributos(caso(id))).classe};
+</script>
+</body>
+</html>
